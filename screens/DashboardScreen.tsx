@@ -372,7 +372,7 @@ console.log('Fetched payments:', resPayments);
           mode="outlined"
           textColor={theme.colors.secondary}
           style={styles.secondaryAction}
-          onPress={() => navigation.navigate('PaymentCreate')}
+          onPress={() => navigation.navigate('LoanCreatePayment')}
         >
           Registrar Pago
         </Button>

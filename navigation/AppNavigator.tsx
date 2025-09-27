@@ -12,6 +12,7 @@ import ClientEditScreen from '../screens/clients/ClientEditScreen';
 import LoansIndex from '../screens/loans/index';
 import LoanCreateScreen from '../screens/loans/create';
 import LoanDetailScreen from '../screens/loans/LoanDetailScreen';
+import PaymentIndex from '../screens/payment/index';
 import PaymentCreate from '../screens/payment/paymentCreate';
 import LogoutButton from '../components/LogoutButton'; 
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +40,9 @@ function MainTabs() {
             case 'Loans':
               name = 'card-outline';
               break;
+            case 'Pagos':
+              name = 'cash-outline';
+              break;
             case 'Logout':
               name = 'exit-outline';
               break;
@@ -52,6 +56,7 @@ function MainTabs() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Clients" component={ClientsIndex} />
       <Tab.Screen name="Loans" component={LoansIndex} />
+      <Tab.Screen name="Pagos" component={PaymentIndex} />
       {/* Tab solo para cerrar sesión */}
       <Tab.Screen
         name="Logout"

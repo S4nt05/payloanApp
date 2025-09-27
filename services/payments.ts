@@ -4,7 +4,7 @@ import { CreatePaymentRequestDto, PaymentDto } from '@/types/api';
 
 export async function getPayments() {
   const r = await api.get('/api/Payments/GetPayments');
-  return r.data as PaymentDto[];
+  return r.data.data as PaymentDto[];
 }
 
 export async function getPaymentById(id: number) {
