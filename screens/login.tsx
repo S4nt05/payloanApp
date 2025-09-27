@@ -1,11 +1,7 @@
-//Screens — LOGIN (src/screens/login.tsx)
-//tsx
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-// import { useAuth } from '@context/AuthContext';
-// import { theme } from '@utils/theme';
 import { useAuth } from '@/context/AuthContext';
 import { theme } from '@/utils/theme';
 

@@ -12,7 +12,6 @@ api.interceptors.request.use(async (config) => {
   try {
     const token = await SecureStore.getItemAsync('token');
     if (token) {
-    //   if (!config.headers) config.headers = {};
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (e) {

@@ -13,7 +13,6 @@ export async function getPaymentById(id: number) {
 }
 
 export async function getPaymentsByLoan(loanId: number) {
-  // Swagger: /api/Payments/GetPaymentsByLoan/{loanId}
   const r = await api.get(`/api/Payments/GetPaymentsByLoan/${loanId}`);
   return r.data as PaymentDto[];
 }

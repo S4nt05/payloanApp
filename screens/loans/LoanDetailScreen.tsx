@@ -1,105 +1,5 @@
-// // src/screens/loans/[id].tsx
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
-// import { useLocalSearchParams, useRouter } from 'expo-router';
-// import { getLoanById, getLoanBalanceById } from '@/services/loans';
-// import { getPaymentsByLoan } from '@/services/payments';
-// import { theme } from '@/utils/theme';
-// import { formatCurrency } from '@/utils/format';
-
-// export default function LoanDetailScreen() {
-//   const params = useLocalSearchParams();
-//   const id = Number(params.id);
-//   const router = useRouter();
-//   const [loan, setLoan] = useState<any>(null);
-//   const [payments, setPayments] = useState<any[]>([]);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     (async () => {
-//       setLoading(true);
-//       try {
-//         const l = await getLoanById(id);
-//         // console.log("LoanDetailScreen - Loan:", l);
-//         setLoan(l);
-//         const p = await getPaymentsByLoan(id);
-//         setPayments(p || []);
-//       } catch (e) {
-//         Alert.alert('Error', 'No se pudo cargar el préstamo');
-//       } finally {
-//         setLoading(false);
-//       }
-//     })();
-//   }, [id]);
-
-//   if (loading) return <View style={{flex:1,justifyContent:'center'}}><ActivityIndicator/></View>;
-//    if (!loan) {
-//       return (
-//          <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-//              <Text style={{color: theme.colors.text}}>Error: Préstamo no encontrado.</Text>
-//              <TouchableOpacity onPress={() => router.back()} style={{marginTop: 20}}>
-//                 <Text style={{color: theme.colors.primary, fontWeight: 'bold'}}>Volver a la lista</Text>
-//              </TouchableOpacity>
-//          </View>
-//       );
-//    }
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <Text style={styles.header}>{loan.customerName ?? `Préstamo #${loan.loanId}`}</Text>
-//       <View style={styles.summaryRow}>
-//         <View style={styles.card}>
-//           <Text style={styles.cardTitle}>Monto</Text>
-//           <Text style={styles.cardValue}>{formatCurrency(loan.loanAmount ?? 0)}</Text>
-//         </View>
-//         <View style={styles.card}>
-//           <Text style={styles.cardTitle}>Saldo</Text>
-//           <Text style={styles.cardValue}>{formatCurrency(loan.outstandingBalance ?? 0)}</Text>
-//         </View>
-//       </View>
-
-//       <View style={{marginTop:12}}>
-//         <Text style={{fontWeight:'700', marginBottom:8}}>Pagos</Text>
-//         <FlatList
-//           data={payments}
-//           keyExtractor={(i)=>String(i.paymentId)}
-//           renderItem={({item})=>(
-//             <View style={styles.paymentRow}>
-//               <View>
-//                 <Text style={{fontWeight:'600'}}>{formatCurrency(item.amount)}</Text>
-//                 <Text style={{color:'#6c757d'}}>{new Date(item.paymentDate).toLocaleDateString()}</Text>
-//               </View>
-//               <Text style={{color:item.status==='Completed'?'green':'orange'}}>{item.status}</Text>
-//             </View>
-//           )}
-//           ListEmptyComponent={<Text style={{color:'#6c757d'}}>No hay pagos registrados</Text>}
-//         />
-//       </View>
-
-//       <View style={{flexDirection:'row', justifyContent:'space-between', marginTop:16}}>
-//         <TouchableOpacity style={styles.action} onPress={()=>router.push(`/loans/${id}/payments/CreatePayment`)}>
-//           <Text style={{color:'#fff'}}>Crear pago</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity style={[styles.action, {backgroundColor: theme.colors.secondary}]} onPress={()=>router.push(`/loans/${id}/edit`)}>
-//           <Text style={{color:'#fff'}}>Editar préstamo</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container:{ flex:1, padding:16, backgroundColor: theme.colors.background },
-//   header:{ fontSize:20, color: theme.colors.primary, fontWeight:'700', marginBottom:8 },
-//   summaryRow:{ flexDirection:'row', justifyContent:'space-between' },
-//   card:{ backgroundColor: theme.colors.surface, padding:12, borderRadius:10, width:'48%', borderWidth:1, borderColor: theme.colors.border },
-//   cardTitle:{ color: theme.colors.text },
-//   cardValue:{ fontSize:18, fontWeight:'800', marginTop:6 },
-//   paymentRow:{ flexDirection:'row', justifyContent:'space-between', padding:12, backgroundColor:'#fff', borderRadius:8, marginBottom:8, borderWidth:1, borderColor:theme.colors.border },
-//   action:{ backgroundColor: theme.colors.primary, padding:14, borderRadius:10, alignItems:'center', width:'48%' }
-// });
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Alert, SafeAreaView } from 'react-native';
-// Usamos hooks estándar de React Navigation
 import { useRoute, useNavigation } from '@react-navigation/native'; 
 import { getLoanById, getLoanBalanceById } from '@/services/loans';
 import { getPaymentsByLoan } from '@/services/payments';
@@ -134,8 +34,8 @@ export default function LoanDetailScreen() {
                 const p = await getPaymentsByLoan(id);
                 setPayments(p || []);
 
-                console.log("getLoanById - item:", l);
-                console.log("getPaymentsByLoan - item:", p);
+                // console.log("getLoanById - item:", l);
+                // console.log("getPaymentsByLoan - item:", p);
             } catch (e) {
                 console.error("Error al cargar detalle del préstamo:", e);
                 Alert.alert('Error', 'No se pudo cargar el préstamo. Por favor, inténtelo de nuevo.');

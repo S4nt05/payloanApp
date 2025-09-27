@@ -3,7 +3,7 @@ import { CustomerDto } from '@/types/api';
 
 export async function fetchCustomers({ page = 1, q = '' }:{page?:number;q?:string}){
   const r = await api.get('/api/Customers/GetCustomer', { params: { page, q } });
-  return r.data; // expected { items: CustomerDto[], total }
+  return r.data; 
 }
 
 export async function createCustomer(payload:CustomerDto){

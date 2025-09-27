@@ -1,6 +1,4 @@
 // src/types/api.ts
-// Tipos generados a partir de tu OpenAPI (schemas)
-
 export interface Country {
   id?: number;
   name?: string | null;

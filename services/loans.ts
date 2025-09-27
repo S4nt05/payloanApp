@@ -8,7 +8,6 @@ export async function createLoan(payload: LoanCreateDto) {
 }
 
 export async function updateLoan(id: number, payload: Partial<LoanCreateDto>) {
-  // Nota: en tu swagger no aparece UpdateLoan endpoint en la primera sección: si existe usar /api/Loans/UpdateLoan/{id}
   const r = await api.put(`/api/Loans/UpdateLoan/${id}`, payload);
   return r.data;
 }

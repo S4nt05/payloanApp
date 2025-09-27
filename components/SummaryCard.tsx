@@ -1,16 +1,3 @@
-// import React from 'react';
-// import { View, Text, StyleSheet } from 'react-native';
-// import { theme } from '@/utils/theme';
-
-// export default function SummaryCard({ title, value }:{ title:string; value:number }){
-//   return (
-//     <View style={styles.card}>
-//       <Text style={styles.title}>{title}</Text>
-//       <Text style={styles.value}>{value}</Text>
-//     </View>
-//   )
-// }
-// const styles = StyleSheet.create({ card:{ backgroundColor:theme.colors.surface, padding:12, borderRadius:12, width:'48%', borderWidth:1, borderColor:theme.colors.border }, title:{ color:theme.colors.text }, value:{ fontSize:20, fontWeight:'700', marginTop:6 } });
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/utils/theme';

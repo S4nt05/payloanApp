@@ -11,6 +11,5 @@ export async function updateProfile(payload:any){
 }
 
 export async function uploadPhotoPlaceholder(base64:string){
-  // placeholder para integracion con presigned urls
   return { url: 'https://cdn.example.com/photo.jpg' };
 }
