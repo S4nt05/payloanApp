@@ -31,3 +31,6 @@ ios/
 # Build
 build/
 temp/
+
+#othres
+package-lock.json

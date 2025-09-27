@@ -1,0 +1,153 @@
+// src/types/api.ts
+// Tipos generados a partir de tu OpenAPI (schemas)
+
+export interface Country {
+  id?: number;
+  name?: string | null;
+  state?: boolean;
+  userCreated?: string | null;
+  dateCreated?: string | null;
+  userChange?: string | null;
+  dateChange?: string | null;
+}
+
+export interface CreatePaymentRequestDto {
+  paymentId?: number;
+  userCreated?: string | null;
+  dateCreated?: string; // ISO string
+  loanId?: number;
+  currencyNumber?: number;
+  amount?: number;
+  paymentMethodId?: number;
+  comentary?: string | null;
+  isPartialPayment?: number;
+}
+
+export interface IncreaseCreditRequestDto {
+  managementId?: number;
+  userCreated?: string | null;
+  dateCreated?: string | null;
+  userChange?: string | null;
+  dateChange?: string | null;
+  description?: string | null;
+  loanId?: number;
+  customerId?: number;
+  refinanceAmount?: number;
+  refinanceDate?: string | null;
+}
+
+export interface LoanCreateDto {
+  loanId?: number;
+  userCreated?: string | null;
+  dateCreated?: string | null;
+  userChange?: string | null;
+  dateChange?: string | null;
+  customerId?: number;
+  paymentFrequencyId?: number;
+  loanAmount?: number;
+  interestRate?: number;
+  currencyNumber?: number;
+  disbursementDate?: string | null;
+  firstDayPay?: string | null;
+  loanStatus?: boolean | null;
+  comment?: string | null;
+  calculationTypeLoanId?: number;
+  term?: number;
+}
+
+export interface LoginUserRequestDto {
+  userName: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface ReferenceDto {
+  id?: number | null;
+  firstName?: string | null;
+  secondName?: string | null;
+  firstLastname?: string | null;
+  secondLastname?: string | null;
+  identification?: string | null;
+  personalAddress?: string | null;
+  workAddress?: string | null;
+  personalPhone?: string | null;
+  workPhone?: string | null;
+  email?: string | null;
+  workplace?: string | null;
+}
+
+export interface SignupUserRequestDto {
+  name: string;
+  email: string;
+  password: string;
+  userName: string;
+  userCreated: string;
+}
+
+export interface SimulateLoanRequestDto {
+  loanAmount?: number;
+  term?: number;
+  interestRate?: number;
+  startDate: string; // required in swagger
+}
+
+export interface SupabaseTokenRequestDto {
+  supabaseToken: string;
+}
+
+/* Tipos auxiliares (útiles en la app) */
+
+export interface UserDto {
+  userId?: number;
+  name: string;
+  email: string;
+  userName: string;
+  phone?: string;
+  photoUrl?: string;
+  role?: 'admin'|'agent'|'viewer';
+}
+
+export interface CustomerDto {
+  id?: number;
+  firstName: string;
+  secondName?: string;
+  firstLastname: string;
+  secondLastname?: string;
+  identification?: string;
+  personalAddress?: string;
+  workAddress?: string;
+  personalPhone?: string;
+  workPhone?: string;
+  email?: string;
+  workplace?: string;
+  state?: 'Activo'|'Inactivo';
+  createdBy?: string;
+  dateCreated?: string;
+  references?: ReferenceDto[];
+}
+
+export interface PaymentDto {
+  paymentId?: number;
+  loanId: number;
+  amount: number;
+  paymentDate: string;
+  method?: string;
+  status?: 'Pending'|'Completed'|'Failed';
+  comment?: string;
+  userCreated?: string;
+  dateCreated?: string;
+}
+
+export interface LoanDto extends LoanCreateDto {
+  // Extiende LoanCreateDto con campos de lectura si aplican
+  loanId?: number;
+  customerName?: string;
+  outstandingBalance?: number;
+  payments?: PaymentDto[];
+}
+
+export interface CatalogItem {
+  id: number;
+  name: string;
+  description?: string;
+}
