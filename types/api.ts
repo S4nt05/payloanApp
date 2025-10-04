@@ -105,6 +105,14 @@ export interface UserDto {
   role?: 'admin'|'agent'|'viewer';
 }
 
+export interface DocumentDto {
+  documentId?: number;
+  name?: string;
+  identification?: string;
+  documentTypeId?: number;
+  urlSecure?: string;
+}
+
 export interface CustomerDto {
   id?: number;
   firstName: string;
@@ -122,6 +130,7 @@ export interface CustomerDto {
   createdBy?: string;
   dateCreated?: string;
   references?: ReferenceDto[];
+  document?: DocumentDto; 
 }
 
 export interface PaymentDto {
