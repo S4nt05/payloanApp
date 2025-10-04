@@ -1,10 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { createCustomer, getCustomerById, updateCustomer } from "@/services/customers";
+import {
+  createCustomer,
+  getCustomerById,
+  updateCustomer,
+} from "@/services/customers";
 import { theme } from "@/utils/theme";
-import {CustomerDto,ReferenceDto} from '@/types/api';
+import { CustomerDto, ReferenceDto } from "@/types/api";
 type FormValues = CustomerDto;
 // Esquema de validación para todos los campos del formulario
 const validationSchema = Yup.object().shape({
@@ -18,13 +32,23 @@ const validationSchema = Yup.object().shape({
 export default function ClientEditScreen({ route, navigation }: any) {
   const { id } = route?.params || {}; // Extrae el ID de los parámetros
   const initialCustomer: FormValues = {
-    firstName: "", secondName: "", firstLastname: "", secondLastname: "",
-    identification: "", personalPhone: "", email: "", personalAddress: "",
-    workAddress: "", workPhone: "", workplace: "",
+    firstName: "",
+    secondName: "",
+    firstLastname: "",
+    secondLastname: "",
+    identification: "",
+    personalPhone: "",
+    email: "",
+    personalAddress: "",
+    workAddress: "",
+    workPhone: "",
+    workplace: "",
+    document: { documentId: undefined }, // 👈 Inicializa el campo documentId
     // Si CustomerDto tiene otros campos REQUERIDOS, incluir aquí como null o valor inicial.
   } as FormValues; // Usamos un cast inicial si FormValues es CustomerDto y tiene required.
-  
-  const [initialValues, setInitialValues] = useState<FormValues>(initialCustomer);
+
+  const [initialValues, setInitialValues] =
+    useState<FormValues>(initialCustomer);
   const [isLoading, setIsLoading] = useState(false);
 
   // 1. Efecto para cargar datos del cliente si existe un ID
@@ -49,16 +73,15 @@ export default function ClientEditScreen({ route, navigation }: any) {
   }, [id]);
 
   const handleSubmit = async (values: FormValues, { setSubmitting }: any) => {
-    
-    // 🔑 AFIRMACIÓN DE TIPO (Type Assertion): 
-    // Le decimos a TypeScript que el objeto `values` es un CustomerDto, 
+    // 🔑 AFIRMACIÓN DE TIPO (Type Assertion):
+    // Le decimos a TypeScript que el objeto `values` es un CustomerDto,
     // ya que pasó la validación de Yup y contiene todos los campos necesarios.
     const customerData: CustomerDto = values as CustomerDto;
 
     try {
       if (id) {
         // Asegúrate de que tu updateCustomer acepta el ID y el DTO
-        await updateCustomer(id, customerData); 
+        await updateCustomer(id, customerData);
         Alert.alert("Éxito", "Cliente actualizado.");
       } else {
         await createCustomer(customerData);
@@ -66,12 +89,12 @@ export default function ClientEditScreen({ route, navigation }: any) {
       }
       navigation.goBack();
     } catch (e: any) {
+      console.log("Error al crear cliente:", e);
       Alert.alert("Error", e.response?.data?.message || "Ocurrió un error.");
     } finally {
       setSubmitting(false);
     }
   };
-
 
   if (id && isLoading) {
     return (
@@ -93,87 +116,107 @@ export default function ClientEditScreen({ route, navigation }: any) {
         onSubmit={handleSubmit}
         enableReinitialize={true} // 🔑 Habilita la recarga del formulario con los nuevos valores
       >
-        {({ handleChange, handleBlur, handleSubmit, values, isSubmitting, errors, touched }) => (
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          isSubmitting,
+          errors,
+          touched,
+        }) => (
           <>
             <TextInput
               placeholder="Primer Nombre"
               style={styles.input}
               value={values.firstName}
-              onChangeText={handleChange('firstName')}
-              onBlur={handleBlur('firstName')}
+              onChangeText={handleChange("firstName")}
+              onBlur={handleBlur("firstName")}
             />
-            {errors.firstName && touched.firstName && <Text style={styles.err}>{errors.firstName}</Text>}
+            {errors.firstName && touched.firstName && (
+              <Text style={styles.err}>{errors.firstName}</Text>
+            )}
             <TextInput
               placeholder="Segundo Nombre (opcional)"
               style={styles.input}
               value={values.secondName}
-              onChangeText={handleChange('secondName')}
+              onChangeText={handleChange("secondName")}
             />
             <TextInput
               placeholder="Primer Apellido"
               style={styles.input}
               value={values.firstLastname}
-              onChangeText={handleChange('firstLastname')}
-              onBlur={handleBlur('firstLastname')}
+              onChangeText={handleChange("firstLastname")}
+              onBlur={handleBlur("firstLastname")}
             />
-            {errors.firstLastname && touched.firstLastname && <Text style={styles.err}>{errors.firstLastname}</Text>}
+            {errors.firstLastname && touched.firstLastname && (
+              <Text style={styles.err}>{errors.firstLastname}</Text>
+            )}
             <TextInput
               placeholder="Segundo Apellido (opcional)"
               style={styles.input}
               value={values.secondLastname}
-              onChangeText={handleChange('secondLastname')}
+              onChangeText={handleChange("secondLastname")}
             />
             <TextInput
               placeholder="Identificación"
               style={styles.input}
               value={values.identification}
-              onChangeText={handleChange('identification')}
+              onChangeText={handleChange("identification")}
             />
             <TextInput
               placeholder="Teléfono Personal"
               keyboardType="phone-pad"
               style={styles.input}
               value={values.personalPhone}
-              onChangeText={handleChange('personalPhone')}
-              onBlur={handleBlur('personalPhone')}
+              onChangeText={handleChange("personalPhone")}
+              onBlur={handleBlur("personalPhone")}
             />
-            {errors.personalPhone && touched.personalPhone && <Text style={styles.err}>{errors.personalPhone}</Text>}
+            {errors.personalPhone && touched.personalPhone && (
+              <Text style={styles.err}>{errors.personalPhone}</Text>
+            )}
             <TextInput
               placeholder="Email"
               keyboardType="email-address"
               style={styles.input}
               value={values.email}
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
             />
-            {errors.email && touched.email && <Text style={styles.err}>{errors.email}</Text>}
+            {errors.email && touched.email && (
+              <Text style={styles.err}>{errors.email}</Text>
+            )}
             <TextInput
               placeholder="Dirección Personal"
               style={styles.input}
               value={values.personalAddress}
-              onChangeText={handleChange('personalAddress')}
+              onChangeText={handleChange("personalAddress")}
             />
             <TextInput
               placeholder="Lugar de Trabajo"
               style={styles.input}
               value={values.workplace}
-              onChangeText={handleChange('workplace')}
+              onChangeText={handleChange("workplace")}
             />
             <TextInput
               placeholder="Dirección de Trabajo"
               style={styles.input}
               value={values.workAddress}
-              onChangeText={handleChange('workAddress')}
+              onChangeText={handleChange("workAddress")}
             />
             <TextInput
               placeholder="Teléfono del Trabajo"
               keyboardType="phone-pad"
               style={styles.input}
               value={values.workPhone}
-              onChangeText={handleChange('workPhone')}
+              onChangeText={handleChange("workPhone")}
             />
 
-            <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={isSubmitting}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSubmit()}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <ActivityIndicator color="#fff" />
               ) : (

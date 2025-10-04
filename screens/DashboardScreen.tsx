@@ -159,13 +159,11 @@ export default function DashboardScreen({ navigation }: any) {
         // Fetch loans chart (may return different shapes)
         const resLoans = await getDashBoard();
         const loansChart = resLoans?.data?.dashboardStats ?? null;
-        console.log('Fetched loans:', loansChart);
         setLoanStatsRaw(loansChart ?? { labels: null, values: null });
 
         // Fetch payments list or stats
         const resPayments = await getPayments();
         
-console.log('Fetched payments:', resPayments);
         setPaymentStatsRaw(resPayments ?? null);
       } catch (err) {
         // Keep raw nulls so sanitizer will use fallbacks
