@@ -12,7 +12,9 @@ import ClientEditScreen from '../screens/clients/ClientEditScreen';
 import LoansIndex from '../screens/loans/index';
 import LoanCreateScreen from '../screens/loans/create';
 import LoanDetailScreen from '../screens/loans/LoanDetailScreen';
+import PaymentIndex from '../screens/payment/index';
 import PaymentCreate from '../screens/payment/paymentCreate';
+import PaymentDetail from '../screens/payment/paymentDetail';
 import LogoutButton from '../components/LogoutButton'; 
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
@@ -39,6 +41,9 @@ function MainTabs() {
             case 'Loans':
               name = 'card-outline';
               break;
+            case 'Pagos':
+              name = 'cash-outline';
+              break;
             case 'Logout':
               name = 'exit-outline';
               break;
@@ -52,6 +57,7 @@ function MainTabs() {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Clients" component={ClientsIndex} />
       <Tab.Screen name="Loans" component={LoansIndex} />
+      <Tab.Screen name="Pagos" component={PaymentIndex} />
       {/* Tab solo para cerrar sesión */}
       <Tab.Screen
         name="Logout"
@@ -65,14 +71,19 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
-  const { user, loading } = useAuth();
+  const { user, loading, forceLogoutActive } = useAuth();
 
   if (loading) return null; // puedes poner un loading indicator
+
+  // Si forceLogoutActive es true o no hay usuario, mostrar login
+  const shouldShowLogin = !user || forceLogoutActive;
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
+        {shouldShowLogin ? (
+          <Stack.Screen name="Login" component={LoginScreen} />
+        ) : (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
             <Stack.Screen name="ClientDetail" component={ClientDetail} />
@@ -80,9 +91,8 @@ export default function AppNavigator() {
             <Stack.Screen name="LoanCreate" component={LoanCreateScreen} />
             <Stack.Screen name="LoanDetail" component={LoanDetailScreen} />
             <Stack.Screen name="LoanCreatePayment" component={PaymentCreate} />
+            <Stack.Screen name="PaymentDetail" component={PaymentDetail} />
           </>
-        ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

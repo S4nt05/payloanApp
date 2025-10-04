@@ -370,7 +370,7 @@ export default function DashboardScreen({ navigation }: any) {
           mode="outlined"
           textColor={theme.colors.secondary}
           style={styles.secondaryAction}
-          onPress={() => navigation.navigate('paymentCreate')}
+          onPress={() => navigation.navigate('LoanCreatePayment')}
         >
           Registrar Pago
         </Button>

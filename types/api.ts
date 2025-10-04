@@ -134,15 +134,19 @@ export interface CustomerDto {
 }
 
 export interface PaymentDto {
-  paymentId?: number;
   loanId: number;
-  amount: number;
+  paymentId: number;
+  receiptNumber: string;
   paymentDate: string;
-  method?: string;
-  status?: 'Pending'|'Completed'|'Failed';
-  comment?: string;
-  userCreated?: string;
-  dateCreated?: string;
+  customerName: string;
+  currency: string;
+  amount: number;
+  amountPaid?: string;
+  paymentMethod: string;
+  previousBalance: number;
+  principalPayment: number;
+  interestPayment: number;
+  newPrincipalBalance: number;
 }
 
 export interface LoanDto extends LoanCreateDto {

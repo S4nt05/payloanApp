@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import * as SecureStore from 'expo-secure-store';
 import { loginService, signupService } from '@/services/auth'; // asegúrate que la ruta exista (tsconfig paths)
 import { getProfile } from '@/services/user';
+import { setLogoutHandler } from '@/services/api';
 
 type AuthContextType = {
   user: any | null;
@@ -11,6 +12,8 @@ type AuthContextType = {
   signup: (payload: any) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  forceLogout: () => void;
+  forceLogoutActive: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +22,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [forceLogoutActive, setForceLogoutActive] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +46,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     })();
   }, []);
+
+  // Registrar el handler de logout para el interceptor de API
+  useEffect(() => {
+    setLogoutHandler(() => {
+      setToken(null);
+      setUser(null);
+      setForceLogoutActive(true);
+    });
+  }, []);
+
+  // Manejar la redirección cuando forceLogoutActive cambia
+  useEffect(() => {
+    if (forceLogoutActive) {
+      // Resetear el flag después de un breve delay para permitir la redirección
+      const timer = setTimeout(() => {
+        setForceLogoutActive(false);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [forceLogoutActive]);
 
   // LOGIN: usa loginService y guarda string correctamente en SecureStore
   const login = async (userName: string, password: string) => {
@@ -89,6 +114,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // Forzar logout y activar redirección
+  const forceLogout = () => {
+    setToken(null);
+    setUser(null);
+    setForceLogoutActive(true);
+  };
+
   const refreshProfile = async () => {
     try {
       const p = await getProfile();
@@ -100,7 +132,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, refreshProfile, forceLogout, forceLogoutActive }}>
       {children}
     </AuthContext.Provider>
   );

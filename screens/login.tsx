@@ -16,7 +16,7 @@ export default function LoginScreen(){
     <View style={styles.container} testID="login-screen">
       <Text style={styles.title}>Iniciar sesión</Text>
       <Formik
-        initialValues={{ userName:'', password:'' }}
+        initialValues={{ userName:'demo', password:'demo' }}
         validationSchema={LoginSchema}
         onSubmit={async (values, { setSubmitting }) => {
           try {
