@@ -9,7 +9,7 @@ export async function getPayments() {
 
 export async function getPaymentById(id: number) {
   const r = await api.get(`/api/Payments/GetPaymentById/${id}`);
-  return r.data as PaymentDto;
+  return r.data.data as PaymentDto;
 }
 
 export async function getPaymentsByLoan(loanId: number) {

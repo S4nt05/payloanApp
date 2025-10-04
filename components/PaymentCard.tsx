@@ -1,6 +1,6 @@
 // src/components/LoanCard.tsx (CORREGIDO)
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { formatCurrency } from '@/utils/format';
+import { formatCurrency, NumberFormatCurrency } from '@/utils/format';
 import { theme } from '@/utils/theme';
 
 export default function PaymentCard({ item, onPress }: any){
@@ -19,8 +19,8 @@ export default function PaymentCard({ item, onPress }: any){
         <Text style={styles.sub}>Método: {item.paymentMethod}</Text>
       </View>
       <View style={{alignItems:'flex-end', justifyContent:'center'}}>
-        <Text style={styles.amount}>-{formatCurrency(item.amount)}</Text>
-        <Text style={styles.balance}>$ {formatCurrency(item.newPrincipalBalance)}</Text>
+        <Text style={styles.amount}>-{NumberFormatCurrency(item.amount, item.currencyCode)}</Text>
+        <Text style={styles.balance}>{NumberFormatCurrency(item.newPrincipalBalance, item.currencyCode)}</Text>
       </View>
     </TouchableOpacity>
   );

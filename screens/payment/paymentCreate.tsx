@@ -18,8 +18,8 @@ export default function PaymentCreate() {
  const router = useRouter();
  const [dateShow, setDateShow] = useState(false);
  return (
-  <SafeAreaView style={{flex:1, padding:16, backgroundColor: theme.colors.background}}>
-   <Text style={{fontSize:20, fontWeight:'700', color: theme.colors.primary}}>Crear Pago</Text>
+  <SafeAreaView style={{flex: 1, marginTop: 40, padding: 16, backgroundColor: theme.colors.background}}>
+   <Text style={{fontSize:20, fontWeight:'700', color: theme.colors.primary}}>Nuevo pago</Text>
    <Formik
     initialValues={{ loanId, amount:'', paymentDate: new Date().toISOString(), comentary:'', paymentMethodId: 1, isPartialPayment: 0, userCreated: '' }}
     validationSchema={Schema}
@@ -50,21 +50,31 @@ export default function PaymentCreate() {
                     <TextInputStyled value={String(values.amount)} onChangeText={handleChange('amount')} placeholder="0.00" keyboardType="numeric" />
 
                     <Text style={{marginTop:8}}>Fecha de pago</Text>
-                    <TouchableOpacity style={styles.selector} onPress={()=> setDateShow(true)}>
-                        <Text>{new Date(values.paymentDate).toLocaleDateString()}</Text>
+                    <TouchableOpacity 
+                        style={[styles.selector, styles.disabledSelector]} 
+                        onPress={()=> setDateShow(true)}
+                        disabled={true}
+                    >
+                      <Text style={styles.disabledText}>{new Date().toLocaleDateString()}</Text>
                     </TouchableOpacity>
-                    
                     {/* 🔑 NUEVO COMPONENTE: Eliminamos headerTextIOS */}
-                    <DateTimePickerModal
+                    {/* <DateTimePickerModal
                         isVisible={dateShow} 
                         mode="date"
                         date={new Date(values.paymentDate)} 
                         onConfirm={handleConfirmDate} 
                         onCancel={() => setDateShow(false)} 
-                    />
+                    /> */}
 
-                    <Text style={{marginTop:8}}>Comentario</Text>
-                    <TextInputStyled value={values.comentary} onChangeText={handleChange('comentary')} placeholder="Opcional" />
+                    <Text style={{marginTop:8}}>Comentario (Opcional)</Text>
+                    <TextInputStyled 
+                        value={values.comentary} 
+                        onChangeText={handleChange('comentary')} 
+                        placeholder="Añade una nota a este pago..." 
+                        multiline={true}
+                        numberOfLines={3}
+                        textAlignVertical="top"
+                    />
 
                     <TouchableOpacity style={styles.button} onPress={() => handleSubmit()} disabled={isSubmitting}>
                         <Text style={{color:'#fff'}}>{isSubmitting ? 'Guardando...' : 'Registrar Pago'}</Text>
@@ -89,6 +99,8 @@ export function TextInputStyled(props: TextInputProps) {
 
 const styles = StyleSheet.create({
  selector:{ padding:12, backgroundColor:'#fff', borderRadius:8, borderWidth:1, borderColor: theme.colors.border },
+ disabledSelector:{ backgroundColor:'#f5f5f5', borderColor:'#ddd', opacity:0.6 },
+ disabledText:{ color:'#999' },
  button:{ marginTop:14, backgroundColor: theme.colors.primary, padding:14, borderRadius:10, alignItems:'center' }
 , input: {
   borderWidth: 1,
@@ -96,5 +108,8 @@ const styles = StyleSheet.create({
   padding: 10,
   borderRadius: 8,
   marginVertical: 5,
+  backgroundColor: '#fff',
+  minHeight: 80,
+  height: 80,
  },
 });

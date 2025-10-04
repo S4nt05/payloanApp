@@ -14,6 +14,7 @@ import LoanCreateScreen from '../screens/loans/create';
 import LoanDetailScreen from '../screens/loans/LoanDetailScreen';
 import PaymentIndex from '../screens/payment/index';
 import PaymentCreate from '../screens/payment/paymentCreate';
+import PaymentDetail from '../screens/payment/paymentDetail';
 import LogoutButton from '../components/LogoutButton'; 
 import { Ionicons } from '@expo/vector-icons';
 import { View } from 'react-native';
@@ -85,6 +86,7 @@ export default function AppNavigator() {
             <Stack.Screen name="LoanCreate" component={LoanCreateScreen} />
             <Stack.Screen name="LoanDetail" component={LoanDetailScreen} />
             <Stack.Screen name="LoanCreatePayment" component={PaymentCreate} />
+            <Stack.Screen name="PaymentDetail" component={PaymentDetail} />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />

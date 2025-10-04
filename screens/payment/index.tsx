@@ -120,7 +120,7 @@ export default function PaymentIndex({ navigation }: any) {
                     return (
                         <PaymentCard
                             item={item}
-                            onPress={()=>navigation.navigate('LoanDetail', { id: item.loanId })}
+                            onPress={()=>navigation.navigate('PaymentDetail', { id: item.paymentId })}
                         />
                     );
                 }}
@@ -135,7 +135,6 @@ export default function PaymentIndex({ navigation }: any) {
                 ListEmptyComponent={<Text style={styles.emptyText}>No se encontraron pagos.</Text>}
             />
 
-            {/* Floating Action Button: SIEMPRE AL FINAL para estar por encima */}
             <Pressable style={styles.fab} onPress={() => navigation.navigate('LoanCreatePayment')} accessibilityLabel="Crear pago">
                 <Ionicons name="add" size={28} color={theme.colors.background} />
             </Pressable>
