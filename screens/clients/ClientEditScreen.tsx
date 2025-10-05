@@ -108,7 +108,7 @@ export default function ClientEditScreen({ route, navigation }: any) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>
-        {id ? "Editar Cliente" : "Crear Cliente"}
+        {id ? "Editar Cliente" : "Nuevo Cliente"}
       </Text>
       <Formik
         initialValues={initialValues}
@@ -236,13 +236,14 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: theme.colors.background,
+    paddingTop: 40,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "800",
     marginBottom: 20,
     color: theme.colors.primary,
-    textAlign: "center",
+    textAlign: "left",
   },
   input: {
     backgroundColor: theme.colors.surface,
