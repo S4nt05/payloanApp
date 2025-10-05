@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
         "extra": {
-          "API_BASE_URL": "http://192.168.0.2:5233"
+          "API_BASE_URL": "https://apidemo.flexilend.loan"
         },
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
