@@ -9,7 +9,10 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
+  Platform,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import * as DocumentPicker from "expo-document-picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import {
@@ -17,20 +20,20 @@ import {
   getCustomerById,
   updateCustomer,
 } from "@/services/customers";
+import { getCountries, getDocumentTypes } from "@/services/catalogs";
 import { theme } from "@/utils/theme";
-import { CustomerDto, ReferenceDto } from "@/types/api";
+import { CustomerDto, ReferenceDto, CatalogItem } from "@/types/api";
 type FormValues = CustomerDto;
-// Esquema de validación para todos los campos del formulario
+
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("El nombre es requerido."),
   firstLastname: Yup.string().required("El apellido es requerido."),
   personalPhone: Yup.string().required("El teléfono es requerido."),
   email: Yup.string().email("Email inválido."),
-  identification: Yup.string(),
 });
 
 export default function ClientEditScreen({ route, navigation }: any) {
-  const { id } = route?.params || {}; // Extrae el ID de los parámetros
+  const { id } = route?.params || {};
   const initialCustomer: FormValues = {
     firstName: "",
     secondName: "",
@@ -43,15 +46,32 @@ export default function ClientEditScreen({ route, navigation }: any) {
     workAddress: "",
     workPhone: "",
     workplace: "",
-    document: { documentId: undefined }, // 👈 Inicializa el campo documentId
-    // Si CustomerDto tiene otros campos REQUERIDOS, incluir aquí como null o valor inicial.
-  } as FormValues; // Usamos un cast inicial si FormValues es CustomerDto y tiene required.
+    countryId: undefined,
+    state: "Activo",
+    document: {
+      documentId: undefined,
+      documentTypeId: undefined,
+      identification: "",
+      file: undefined,
+    },
+    references: [
+      { firstName: "", firstLastname: "", personalPhone: "", workplace: "" },
+    ],
+  } as FormValues;
 
   const [initialValues, setInitialValues] =
     useState<FormValues>(initialCustomer);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 1. Efecto para cargar datos del cliente si existe un ID
+  // Catálogos
+  const [countries, setCountries] = useState<CatalogItem[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<CatalogItem[]>([]);
+
+  useEffect(() => {
+    getCountries().then(setCountries);
+    getDocumentTypes().then(setDocumentTypes);
+  }, []);
+
   useEffect(() => {
     async function loadCustomer() {
       if (id) {
@@ -59,7 +79,7 @@ export default function ClientEditScreen({ route, navigation }: any) {
         try {
           const response = await getCustomerById(id);
           if (response?.data) {
-            setInitialValues(response.data); // Asigna los datos de la API al estado inicial
+            setInitialValues(response.data);
           }
         } catch (e) {
           Alert.alert("Error", "No se pudo cargar la información del cliente.");
@@ -73,14 +93,9 @@ export default function ClientEditScreen({ route, navigation }: any) {
   }, [id]);
 
   const handleSubmit = async (values: FormValues, { setSubmitting }: any) => {
-    // 🔑 AFIRMACIÓN DE TIPO (Type Assertion):
-    // Le decimos a TypeScript que el objeto `values` es un CustomerDto,
-    // ya que pasó la validación de Yup y contiene todos los campos necesarios.
     const customerData: CustomerDto = values as CustomerDto;
-
     try {
       if (id) {
-        // Asegúrate de que tu updateCustomer acepta el ID y el DTO
         await updateCustomer(id, customerData);
         Alert.alert("Éxito", "Cliente actualizado.");
       } else {
@@ -114,12 +129,13 @@ export default function ClientEditScreen({ route, navigation }: any) {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-        enableReinitialize={true} // 🔑 Habilita la recarga del formulario con los nuevos valores
+        enableReinitialize={true}
       >
         {({
           handleChange,
           handleBlur,
           handleSubmit,
+          setFieldValue,
           values,
           isSubmitting,
           errors,
@@ -158,6 +174,31 @@ export default function ClientEditScreen({ route, navigation }: any) {
               value={values.secondLastname}
               onChangeText={handleChange("secondLastname")}
             />
+            {/* País */}
+            <Text style={{ marginTop: 10, marginBottom: 4, fontWeight: "600" }}>
+              País
+            </Text>
+            {Platform.OS === "android" ? (
+              <Picker
+                selectedValue={values.countryId}
+                onValueChange={(v) => setFieldValue("countryId", v)}
+                style={styles.input}
+              >
+                <Picker.Item label="Selecciona país" value={undefined} />
+                {countries.map((c) => (
+                  <Picker.Item key={c.id} label={c.name} value={c.id} />
+                ))}
+              </Picker>
+            ) : (
+              <TextInput
+                placeholder="País"
+                style={styles.input}
+                value={
+                  countries.find((c) => c.id === values.countryId)?.name || ""
+                }
+                editable={false}
+              />
+            )}
             <TextInput
               placeholder="Identificación"
               style={styles.input}
@@ -211,7 +252,132 @@ export default function ClientEditScreen({ route, navigation }: any) {
               value={values.workPhone}
               onChangeText={handleChange("workPhone")}
             />
-
+            {/* Tipo de documento */}
+            <Text style={{ marginTop: 10, marginBottom: 4, fontWeight: "600" }}>
+              Tipo de documento
+            </Text>
+            {Platform.OS === "android" ? (
+              <Picker
+                selectedValue={values.document?.documentTypeId}
+                onValueChange={(v) =>
+                  setFieldValue("document", {
+                    ...values.document,
+                    documentTypeId: v,
+                  })
+                }
+                style={styles.input}
+              >
+                <Picker.Item label="Selecciona tipo" value={undefined} />
+                {documentTypes.map((dt) => (
+                  <Picker.Item
+                    key={dt.id}
+                    label={dt.description || dt.name}
+                    value={dt.id}
+                  />
+                ))}
+              </Picker>
+            ) : (
+              <TextInput
+                placeholder="Tipo de documento"
+                style={styles.input}
+                value={
+                  documentTypes.find(
+                    (dt) => dt.id === values.document?.documentTypeId
+                  )?.description || ""
+                }
+                editable={false}
+              />
+            )}
+            <TextInput
+              placeholder="Número de documento"
+              style={styles.input}
+              value={values.document?.identification ?? ""}
+              onChangeText={(v) =>
+                setFieldValue("document", {
+                  ...values.document,
+                  identification: v,
+                })
+              }
+            />
+            {/* Adjuntar archivo */}
+            <TouchableOpacity
+              style={[
+                styles.input,
+                {
+                  justifyContent: "center",
+                  alignItems: "flex-start",
+                  flexDirection: "row",
+                },
+              ]}
+              onPress={async () => {
+                const result = await DocumentPicker.getDocumentAsync({
+                  type: ["application/pdf", "image/*"],
+                  copyToCacheDirectory: true,
+                  multiple: false,
+                });
+                if (result.assets && result.assets.length > 0) {
+                  const file = result.assets[0];
+                  setFieldValue("document", {
+                    ...values.document,
+                    file: {
+                      uri: file.uri,
+                      name: file.name,
+                      type: file.mimeType || "application/octet-stream",
+                    },
+                  });
+                }
+              }}
+            >
+              <Text>
+                {values.document?.file?.name
+                  ? `Archivo: ${values.document.file.name}`
+                  : "Seleccionar archivo (PDF o imagen)"}
+              </Text>
+            </TouchableOpacity>
+            {/* Referencia personal */}
+            <Text style={{ marginTop: 16, fontWeight: "bold" }}>
+              Referencia personal
+            </Text>
+            <TextInput
+              placeholder="Nombre referencia"
+              style={styles.input}
+              value={values.references?.[0]?.firstName ?? ""}
+              onChangeText={(v) => {
+                const refs = values.references ? [...values.references] : [{}];
+                refs[0] = { ...refs[0], firstName: v };
+                setFieldValue("references", refs);
+              }}
+            />
+            <TextInput
+              placeholder="Apellido referencia"
+              style={styles.input}
+              value={values.references?.[0]?.firstLastname ?? ""}
+              onChangeText={(v) => {
+                const refs = values.references ? [...values.references] : [{}];
+                refs[0] = { ...refs[0], firstLastname: v };
+                setFieldValue("references", refs);
+              }}
+            />
+            <TextInput
+              placeholder="Celular referencia"
+              style={styles.input}
+              value={values.references?.[0]?.personalPhone ?? ""}
+              onChangeText={(v) => {
+                const refs = values.references ? [...values.references] : [{}];
+                refs[0] = { ...refs[0], personalPhone: v };
+                setFieldValue("references", refs);
+              }}
+            />
+            <TextInput
+              placeholder="Lugar de trabajo referencia"
+              style={styles.input}
+              value={values.references?.[0]?.workplace ?? ""}
+              onChangeText={(v) => {
+                const refs = values.references ? [...values.references] : [{}];
+                refs[0] = { ...refs[0], workplace: v };
+                setFieldValue("references", refs);
+              }}
+            />
             <TouchableOpacity
               style={styles.button}
               onPress={() => handleSubmit()}
@@ -221,7 +387,7 @@ export default function ClientEditScreen({ route, navigation }: any) {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.buttonText}>
-                  {id ? "Actualizar" : "Guardar"}
+                  {id ? "Actualizar Cliente" : "Crear Cliente"}
                 </Text>
               )}
             </TouchableOpacity>
