@@ -6,19 +6,11 @@ export async function fetchCustomers({ page = 1, q = '' }:{page?:number;q?:strin
   return r.data; 
 }
 
-// export async function createCustomer(payload: CustomerDto) {
-//   const processId = 2;
-//   console.log('Creando cliente:', payload);
-//   const r = await api.post(`/api/Customers/CreateOrEditCustomer/${processId}`, payload);
-//   console.log('Respuesta:', r);
-//   return r.data;
-// }
-
 export async function createCustomer(payload: CustomerDto) {
   const processId = 2;
   const formData = new FormData();
 
-  formData.append('Id', '0');
+  formData.append('Id', payload.id?.toString() ?? '0');
   formData.append('FirstName', payload.firstName);
   formData.append('SecondName', payload.secondName ?? '');
   formData.append('FirstLastname', payload.firstLastname);
@@ -30,20 +22,46 @@ export async function createCustomer(payload: CustomerDto) {
   formData.append('WorkPhone', payload.workPhone ?? '');
   formData.append('Email', payload.email ?? '');
   formData.append('Workplace', payload.workplace ?? '');
-  formData.append('UserCreated', 'admin');
-  formData.append('DateCreated', new Date().toISOString());
-  formData.append('UserChange', 'admin');
-  formData.append('DateChange', new Date().toISOString());
-  formData.append('CountryId', '1');
-  formData.append('State', 'true');
-  formData.append('Status', 'Activo');
-  formData.append('Document.DocumentId', '1');
-  formData.append('Document.DocumentTypeId', '1');
-  formData.append('Document.Name', '');
-  formData.append('Document.Identification', '');
-  formData.append('Document.UrlSecure', '');
-  // Si no tienes archivo, omite Document.File
-  formData.append('Reference', JSON.stringify(payload.references ?? []));
+  formData.append('UserCreated', payload.createdBy ?? 'admin');
+  formData.append('DateCreated', payload.dateCreated ?? new Date().toISOString());
+  formData.append('UserChange', payload.createdBy ?? 'admin');
+  formData.append('DateChange', payload.dateCreated ?? new Date().toISOString());
+  formData.append('CountryId', payload.countryId?.toString() ?? '1');
+  formData.append('State', payload.state === 'Activo' ? 'true' : 'false');
+  formData.append('Status', payload.state ?? 'Activo');
+
+  // Document
+  formData.append('Document.DocumentId', payload.document?.documentId?.toString() ?? '0');
+  formData.append('Document.DocumentTypeId', payload.document?.documentTypeId?.toString() ?? '');
+  formData.append('Document.Name', payload.document?.name ?? '');
+  formData.append('Document.Identification', payload.document?.identification ?? '');
+  formData.append('Document.UrlSecure', payload.document?.urlSecure ?? '');
+
+  // Adjuntar archivo si existe
+  if (payload.document?.file) {
+    formData.append('Document.File', {
+      uri: payload.document.file.uri,
+      name: payload.document.file.name,
+      type: payload.document.file.type,
+    });
+  }
+
+ if (payload.references && payload.references.length > 0) {
+  payload.references.forEach((ref, idx) => {
+    if (ref.firstName) formData.append(`Reference[${idx}].FirstName`, ref.firstName);
+    if (ref.secondName) formData.append(`Reference[${idx}].SecondName`, ref.secondName);
+    if (ref.firstLastname) formData.append(`Reference[${idx}].FirstLastname`, ref.firstLastname);
+    if (ref.secondLastname) formData.append(`Reference[${idx}].SecondLastname`, ref.secondLastname);
+    if (ref.identification) formData.append(`Reference[${idx}].Identification`, ref.identification);
+    if (ref.personalAddress) formData.append(`Reference[${idx}].PersonalAddress`, ref.personalAddress);
+    if (ref.workAddress) formData.append(`Reference[${idx}].WorkAddress`, ref.workAddress);
+    if (ref.personalPhone) formData.append(`Reference[${idx}].PersonalPhone`, ref.personalPhone);
+    if (ref.workPhone) formData.append(`Reference[${idx}].WorkPhone`, ref.workPhone);
+    if (ref.email) formData.append(`Reference[${idx}].Email`, ref.email);
+    if (ref.workplace) formData.append(`Reference[${idx}].Workplace`, ref.workplace);
+    if (ref.id !== undefined && ref.id !== null) formData.append(`Reference[${idx}].Id`, ref.id.toString());
+  });
+}
 
   console.log('Creando cliente:', formData);
 

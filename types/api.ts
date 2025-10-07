@@ -111,6 +111,7 @@ export interface DocumentDto {
   identification?: string;
   documentTypeId?: number;
   urlSecure?: string;
+  file?: any;
 }
 
 export interface CustomerDto {

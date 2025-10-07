@@ -9,97 +9,73 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { fetchCustomers } from "@/services/customers";
-import { useDebounce } from "@/hooks/useDebounce";
 import CustomerCard from "@/components/CustomerCard";
 import { theme } from "@/utils/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { CustomerDto } from "@/types/api";
 
 export default function ClientsIndex({ navigation }: any) {
   const [q, setQ] = useState("");
-  const dq = useDebounce(q, 400);
-
-  // 🔑 1. AISLAMIENTO: Usamos useRef para el estado de la página
-  const pageRef = useRef(1);
-  const totalRef = useRef(0); // También aislamos el total para la verificación de límite
-
+  const [items, setItems] = useState<CustomerDto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
-  // 🔑 USAMOS useRef para aislar todos los valores que NO deben causar re-renderizados
-  const dqRef = useRef(dq); // Ref para el valor de búsqueda (dq)
-  const isFetchingRef = useRef(false); // Ref para evitar llamadas concurrentes
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Evita cargar varias veces al hacer scroll rápido
+  const isFetchingRef = useRef(false);
 
   const load = useCallback(
     async (reset = false) => {
-      // 🛑 Evitar llamadas concurrentes
-      if (isFetchingRef.current) return;
-
+      if (isFetchingRef.current || (!hasMore && !reset)) return;
       isFetchingRef.current = true;
       setLoading(true);
-
-      const pageToFetch = reset ? 1 : pageRef.current;
-      const currentQuery = reset ? dqRef.current : dq; // Usar el dq más reciente en reset
-
-      // 🛑 LÍMITE: Si ya cargamos todo y no es un reset, salimos.
-      if (!reset && items.length >= totalRef.current && totalRef.current > 0) {
-        isFetchingRef.current = false;
-        setLoading(false);
-        return;
-      }
-
       try {
-        const r = await fetchCustomers({ page: pageToFetch, q: currentQuery });
+        const nextPage = reset ? 1 : page;
+        const res = await fetchCustomers({ page: nextPage, q });
+        const list = res.data ?? [];
+        setHasMore(list.length > 0);
 
-        const list = Array.isArray(r?.data) ? r.data : [];
-        const apiTotal = r?.total || totalRef.current;
+        setItems((prevItems) => {
+          let newItems = reset ? list : [...prevItems, ...list];
+          // Filtra duplicados por id
+          const seen = new Set();
+          newItems = newItems.filter((item) => {
+            if (!item || !item.id) return false;
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+          });
+          return newItems;
+        });
 
-        totalRef.current = apiTotal;
-
-        // Actualizamos items (usando la forma funcional para no depender de items en useCallback)
-        setItems((prevItems) => (reset ? list : [...prevItems, ...list]));
-
-        // Avanza la página si hubo datos
-        if (list.length > 0) {
-          pageRef.current = pageToFetch + 1;
-        } else if (reset) {
-          pageRef.current = 2; // Si no hay resultados en pág 1, la siguiente será la 2 (vacía)
-        }
+        if (!reset) setPage(nextPage + 1);
+        else setPage(2);
       } catch (e) {
-        console.warn("Error fetching customers:", e);
+        // Manejo de error opcional
       } finally {
-        isFetchingRef.current = false;
         setLoading(false);
+        isFetchingRef.current = false;
       }
     },
-    [items.length]
-  ); // Dependencia mínima: solo para la lógica de límite de paginación
+    [page, q, hasMore]
+  );
 
-  // 2. useEffect para la Búsqueda (Monitorea dq y dispara el RESET)
+  // Buscar o refrescar
   useEffect(() => {
-    // Si el valor debounced ha cambiado, reseteamos la lista y cargamos la página 1
-    if (dqRef.current !== dq) {
-      dqRef.current = dq; // Actualizamos la referencia con el nuevo valor de búsqueda
+    load(true);
+  }, [q]);
 
-      pageRef.current = 1;
-      totalRef.current = 0;
-      setItems([]); // Limpiar la lista para la nueva búsqueda
-
-      // Llama a la carga con RESET
-      load(true);
-    }
-  }, [dq, load]); // Depende de dq (para el cambio) y loadData (para la ejecución)
-
-  // 3. useEffect para la Carga Inicial
+  // Carga inicial
   useEffect(() => {
-    // Carga inicial solo si la lista está vacía
     if (items.length === 0 && !isFetchingRef.current) {
       load(true);
     }
-  }, []); // Se ejecuta solo una vez al montar el componente
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Clientes</Text>
-        {/* Elimina el botón de aquí */}
       </View>
       <TextInput
         placeholder="Buscar..."
@@ -109,7 +85,7 @@ export default function ClientsIndex({ navigation }: any) {
       />
       <FlatList
         data={items}
-        keyExtractor={(i) => String(i.id)}
+        keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
           <CustomerCard
             item={item}
@@ -125,9 +101,7 @@ export default function ClientsIndex({ navigation }: any) {
         style={styles.fab}
         onPress={() => navigation.navigate("ClientEdit")}
       >
-        <Text style={{ color: "#fff", fontSize: 28, fontWeight: "bold" }}>
-          +
-        </Text>
+        <Ionicons name="add" size={32} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -140,7 +114,7 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingTop: 32,
   },
-  title: { fontSize: 20, fontWeight: "700", color: theme.colors.primary },
+  title: { fontSize: 20, fontWeight: "700", color: theme.colors.text },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
